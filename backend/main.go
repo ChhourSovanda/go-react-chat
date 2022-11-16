@@ -8,7 +8,19 @@ import (
 )
 
 func serveWS(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
+	fmt.Println("websocket endpoint reached")
 
+	conn, err := websocket.Upgrade(w, r)
+
+	if err != nil {
+		fmt.Fprintf(w, "%+v\n", err)
+	}
+	client := &websocket.Client{
+		Conn: conn,
+		Pool: pool,
+	}
+	pool.Register <- client
+	client.Read()
 }
 
 func setupRoutes() {
@@ -21,7 +33,7 @@ func setupRoutes() {
 }
 
 func main() {
-	fmt.Println("Wanda full stack chat project")
+	fmt.Println("--->>> Go + React full stack chat project")
 	setupRoutes()
 	http.ListenAndServe(":9000", nil)
 }
